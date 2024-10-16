@@ -1,3 +1,5 @@
+// src/pages/Login.js
+
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import "../styles/Login.css";
@@ -5,40 +7,42 @@ import { FcGoogle } from "react-icons/fc";
 import api from "../api";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const data = { email, senha };
+  // In your Login component
+const handleLogin = async (e) => {
+  e.preventDefault();
+  try {
+      const data = { nickname, password };
       const response = await api.post("/api/users/login", data);
-      const userData = {
-        id: response.data.usuario.id,
-        nome: response.data.usuario.nome,
-        email: response.data.usuario.email,
-        dataNascimento: response.data.usuario.dataNascimento,
-      };
+      
+      if (response.data === true) {
+          // Authentication successful
+          const userResponse = await api.get(`/api/users/buscar/${nickname}`);
+          const userData = userResponse.data;
 
-      // Salvando o token no localStorage
-      localStorage.setItem("token", response.data.token);
+          // Save user data to localStorage
+          localStorage.setItem("user", JSON.stringify(userData));
 
-      // Salvando os dados do usuário no localStorage
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      navigate("/home");
-    } catch (error) {
+          // Navigate to home
+          navigate("/home");
+      } else {
+          alert("Nickname ou senha incorretos");
+      }
+  } catch (error) {
       console.error("Erro no login", error);
-    }
-  };
+  }
+};
+
 
   return (
     <div className="corpo">
       <div className="container">
         <div className="signup-box">
           <h2>Login</h2>
-          <p>Entre, guarde e compartilher seus documentos</p>
+          <p>Entre, guarde e compartilhe seus documentos</p>
           <button className="google-signup">
             <FcGoogle className="imagem" />
             Use Google account
@@ -47,11 +51,11 @@ const Login = () => {
           <form onSubmit={handleLogin}>
             <div className="input-group">
               <input
-                type="email"
-                id="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                id="nickname"
+                placeholder="Nickname"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
                 required
               />
             </div>
@@ -59,9 +63,9 @@ const Login = () => {
               <input
                 type="password"
                 id="password"
-                placeholder="Password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>

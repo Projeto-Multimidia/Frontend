@@ -1,32 +1,34 @@
+// src/pages/Register.js
+
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import api from "../api";
 import "../styles/Register.css";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      console.log(dataNascimento);
-      const response = await api.post("http://localhost:3000/api/users", {
-        name,
+      const userData = {
         email,
-        senha,
-        dataNascimento,
-      });
-      setUser(response.data);
-
-      navigate("/");
+        nickname,
+        password,
+      };
+      const response = await api.post("/api/users", userData);
+      if (response.status === 200 || response.status === 201) {
+        alert("Usuário cadastrado com sucesso!");
+        navigate("/");
+      } else {
+        alert("Erro ao cadastrar usuário.");
+      }
     } catch (error) {
-      console.error("Erro no login", error);
+      console.error("Erro no cadastro", error);
     }
   };
 
@@ -37,12 +39,12 @@ const Register = () => {
         <p>Venha fazer parte da nossa comunidade</p>
         <form onSubmit={handleRegister}>
           <div className="input-group">
-            <label htmlFor="name">Nome completo</label>
+            <label htmlFor="nickname">Nickname</label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="nickname"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               required
             />
           </div>
@@ -61,17 +63,8 @@ const Register = () => {
             <input
               type="password"
               id="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>Data de Nascimento:</label>
-            <input
-              type="date"
-              value={dataNascimento}
-              onChange={(e) => setDataNascimento(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
