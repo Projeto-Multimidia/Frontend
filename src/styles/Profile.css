@@ -1,0 +1,132 @@
+.profile-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .profile-header {
+    position: relative;
+  }
+  
+  .profile-background {
+    height: 150px;
+    background: linear-gradient(135deg, #7f9cf5, #5a67d8);
+  }
+  
+  .profile-details {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+    transform: translateY(-40px);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 5px solid white;
+    margin-right: 20px;
+  }
+  
+  .profile-info {
+    flex-grow: 1;
+  }
+  
+  .profile-info h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .profile-info .role {
+    margin-top: 5px;
+    color: #666;
+  }
+  
+  .profile-info .location {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .profile-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-edit, .btn-settings {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .btn-settings {
+    background-color: #e9ecef;
+    color: #333;
+  }
+  
+  .profile-extras {
+    padding: 20px;
+  }
+  
+  .extra-info {
+    margin-bottom: 20px;
+  }
+  
+  .label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #666;
+  }
+  
+  .badge {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-right: 5px;
+  }
+  
+  .skills {
+    margin-bottom: 20px;
+  }
+  
+  .skill-badges .badge {
+    background-color: #e9ecef;
+    color: #333;
+  }
+  
+  .extra-options {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .extra-options .option {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    width: 30%;
+  }
+  
+  .option p {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .option span {
+    color: #666;
+    font-size: 12px;
+  }
+  
