@@ -1,7 +1,5 @@
-// src/pages/Register.js
-
 import { useState } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import "../styles/Register.css";
 
@@ -29,6 +27,7 @@ const Register = () => {
       }
     } catch (error) {
       console.error("Erro no cadastro", error);
+      alert("Erro ao cadastrar usuário. Por favor, tente novamente.");
     }
   };
 
@@ -73,8 +72,7 @@ const Register = () => {
           </button>
         </form>
         <p className="signin-redirect">
-          Já possui uma conta?&nbsp;
-          <NavLink to={"/"}>Conecte-se</NavLink>
+          Já possui uma conta? <a href="/">Conecte-se</a>
         </p>
       </div>
     </div>

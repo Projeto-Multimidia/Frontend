@@ -1,48 +1,79 @@
-// src/pages/Home.js
-
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import api from "../api";
 import "../styles/Home.css";
-import document from "../assets/image.jpg"; // Você pode ajustar para exibir a imagem correta
 import userImage from "../assets/userimage.jpg";
 import UploadModal from "../components/upload-modal";
+import CommentsModal from "../components/comments-modal";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado do modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   const user = JSON.parse(localStorage.getItem("user"));
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await api.get("/api/files");
-        setPosts(response.data); // Atualiza o estado com os dados da API
-      } catch (error) {
-        console.error("Erro ao buscar arquivos", error.message);
-      }
-    };
+  const fetchPosts = async () => {
+    try {
+      const response = await api.get("/api/files");
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar arquivos", error.message);
+    }
+  };
 
+  useEffect(() => {
     fetchPosts();
-  }, []);
+
+    const intervalId = setInterval(() => {
+      fetchPosts();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [updateTrigger]);
 
   const handleLike = async (fileId) => {
     try {
-      await api.post(`/api/files/${fileId}/like`);
-      // Atualiza o estado local para refletir o novo número de curtidas
+      await api.put(`/api/files/like/${fileId}`);
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === fileId ? { ...post, likes: (post.likes || 0) + 1 } : post
         )
       );
+      setUpdateTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Erro ao curtir o arquivo", error.message);
     }
   };
 
-  // Função para abrir e fechar o modal
-  const toggleModal = () => {
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      const response = await api.get(`/api/files/download/${fileId}`, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      if (typeof window !== "undefined" && typeof window.document !== "undefined") {
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", fileName);
+        window.document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    } catch (error) {
+      console.error("Erro ao fazer download do arquivo", error.message);
+    }
+  };
+
+  const toggleUploadModal = () => {
     setIsModalOpen(!isModalOpen);
+  };
+
+  const toggleCommentsModal = (post) => {
+    setSelectedPost(post);
+    setIsCommentsModalOpen(!isCommentsModalOpen);
+    setUpdateTrigger((prev) => prev + 1);
   };
 
   return (
@@ -75,7 +106,7 @@ const Home = () => {
                 className="new-post-input"
                 placeholder="Compartilhe algo..."
               />
-              <button className="btn-upload" onClick={toggleModal}>
+              <button className="btn-upload" onClick={toggleUploadModal}>
                 Upload de arquivo
               </button>
             </div>
@@ -86,6 +117,7 @@ const Home = () => {
               <span>🔒 Público</span>
             </div>
           </div>
+
           {posts.map((post, index) => (
             <div key={index} className="post">
               <div className="post-header">
@@ -95,22 +127,21 @@ const Home = () => {
               <div>
                 <p className="post-description">{post.fileName}</p>
               </div>
-              <img
-                className="post-image"
-                src={`data:${post.type};base64,${post.data}`}
-                alt="Post"
-              />
-              <p>
-                <strong>Tipo de Arquivo:</strong> {post.type}
-              </p>
-              <p>
-                <strong>Tamanho:</strong>{" "}
-                {(post.size / 1024).toFixed(2)} KB
-              </p>
+              <p><strong>Tipo de Arquivo:</strong> {post.type}</p>
+              <p><strong>Tamanho:</strong> {(post.size / 1024).toFixed(2)} KB</p>
               <div className="post-interactions">
-              <span onClick={() => handleLike(post.id)}>❤️ {post.likes || 0}</span>
-                <span>💬 {post.comments ? post.comments.length : 0}</span>
-                <span>🔁 0</span>
+                <span onClick={() => handleLike(post.id)}>
+                  ❤️ {post.likes || 0}
+                </span>
+                <span onClick={() => toggleCommentsModal(post)}>
+                  💬 {post.comments ? post.comments.length : 0}
+                </span>
+                <button
+                  className="btn-download"
+                  onClick={() => handleDownload(post.id, post.fileName)}
+                >
+                  📥 Download
+                </button>
               </div>
             </div>
           ))}
@@ -131,8 +162,9 @@ const Home = () => {
         </aside>
       </div>
 
-      {/* Modal de upload */}
-      {isModalOpen && <UploadModal toggleModal={toggleModal} />} 
+      {isModalOpen && <UploadModal toggleModal={toggleUploadModal} />}
+
+      {isCommentsModalOpen && <CommentsModal post={selectedPost} toggleModal={toggleCommentsModal} />}
     </div>
   );
 };
