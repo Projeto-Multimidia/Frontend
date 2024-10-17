@@ -19,7 +19,7 @@ const Login = () => {
 
         localStorage.setItem("user", JSON.stringify(userData));
 
-        navigate("/home");
+        navigate("/");
       } else {
         alert("Nickname ou senha incorretos");
       }
